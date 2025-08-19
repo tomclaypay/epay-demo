@@ -15,12 +15,5 @@
       "locked": 7.55,
       "total": 900.0
     }
-  ],
-  "limits": {
-    "daily_deposit_vnd": 50000000,
-    "daily_withdraw_vnd": 20000000,
-    "daily_deposit_crypto": 10000,
-    "daily_withdraw_crypto": 5000,
-    "monthly_limit": 500000000
-  }
+  ]
 }

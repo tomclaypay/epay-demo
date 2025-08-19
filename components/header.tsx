@@ -1,22 +1,46 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { BellIcon, GlobeIcon, HelpCircleIcon, MoreHorizontalIcon, SettingsIcon } from "lucide-react"
-import { useLanguage } from "@/contexts/language-context"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  BellIcon,
+  GlobeIcon,
+  HelpCircleIcon,
+  MoreHorizontalIcon,
+  SettingsIcon,
+} from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
+import { useEffect, useState } from "react";
+import { apiService } from "@/lib/api-service";
 
 export function Header() {
-  const { language, setLanguage, t } = useLanguage()
+  const { language, setLanguage, t } = useLanguage();
+  const [balance, setBalance] = useState(0);
+
+  useEffect(() => {
+    const getBalance = async () => {
+      const response = await apiService.getAccount();
+      console.log("response", response);
+      setBalance(
+        Number(
+          typeof response.balances[0] === "object"
+            ? response.balances[0]?.available
+            : response.balances[0] || 0
+        )
+      );
+    };
+    getBalance();
+  }, []);
 
   const toggleLanguage = () => {
-    setLanguage(language === "vi" ? "en" : "vi")
-  }
+    setLanguage(language === "vi" ? "en" : "vi");
+  };
 
   return (
     <header className="h-16 bg-background border-b border-border flex items-center justify-between px-6">
       {/* Logo */}
       <div className="flex items-center">
-        <h1 className="text-2xl font-bold text-foreground">exness</h1>
+        <h1 className="text-2xl font-bold text-foreground">DEMO</h1>
       </div>
 
       {/* Right side */}
@@ -24,7 +48,9 @@ export function Header() {
         {/* Balance */}
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-background">
-            <span className="text-sm font-medium">0.91 {t("balance")}</span>
+            <span className="text-sm font-medium">
+              {balance} {t("balance")}
+            </span>
           </Badge>
         </div>
 
@@ -37,7 +63,9 @@ export function Header() {
             title={`Switch to ${language === "vi" ? "English" : "Tiếng Việt"}`}
           >
             <GlobeIcon className="h-4 w-4" />
-            <span className="ml-1 text-xs font-medium">{language.toUpperCase()}</span>
+            <span className="ml-1 text-xs font-medium">
+              {language.toUpperCase()}
+            </span>
           </Button>
           <Button variant="ghost" size="icon">
             <HelpCircleIcon className="h-4 w-4" />
@@ -54,5 +82,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

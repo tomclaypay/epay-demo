@@ -1,5 +1,5 @@
 class EpayAPI {
-  private baseUrl = process.env.EPAY_API_URL;
+  private baseUrl = process.env.NEXT_PUBLIC_EPAY_API_URL;
 
   // Deposit APIs
   async createDeposit(data: { mt5Id: string; amount: number; ref: string }) {
@@ -7,11 +7,11 @@ class EpayAPI {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": process.env.EPAY_API_KEY || "",
+        "X-API-KEY": process.env.NEXT_PUBLIC_EPAY_API_KEY || "",
       },
       body: JSON.stringify({
         ...data,
-        callback: "https://your-callback-url.com", // Replace with your callback URL
+        callback: process.env.NEXT_PUBLIC_CALLBACK_URL, // Replace with your callback URL
       }),
     });
     console.log("response", response);
@@ -32,13 +32,20 @@ class EpayAPI {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": process.env.EPAY_API_KEY || "",
+        "X-API-KEY": process.env.NEXT_PUBLIC_EPAY_API_KEY || "",
       },
       body: JSON.stringify({
         ...data,
-        callback: "https://your-callback-url.com", // Replace with your callback URL
+        callback: process.env.NEXT_PUBLIC_CALLBACK_URL, // Replace with your callback URL
       }),
     });
+    console.log(
+      "data",
+      JSON.stringify({
+        ...data,
+        callback: process.env.NEXT_PUBLIC_CALLBACK_URL, // Replace with your callback URL
+      })
+    );
     if (!response.ok) throw new Error("Failed to create withdraw");
     return response.json();
   }
@@ -53,11 +60,11 @@ class EpayAPI {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": process.env.EPAY_API_KEY || "",
+        "X-API-KEY": process.env.NEXT_PUBLIC_EPAY_API_KEY || "",
       },
       body: JSON.stringify({
         ...data,
-        callback: "https://your-callback-url.com", // Replace with your callback URL
+        callback: process.env.NEXT_PUBLIC_CALLBACK_URL, // Replace with your callback URL
       }),
     });
     if (!response.ok) throw new Error("Failed to fetch wallet address");
@@ -69,18 +76,18 @@ class EpayAPI {
     chainName: string;
     mt5Id: string;
     ref: string;
-    usdAmount: string;
+    usdAmount: number;
     toAddress: string;
   }) {
     const response = await fetch(`${this.baseUrl}/withdrawals/crypto`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": process.env.EPAY_API_KEY || "",
+        "X-API-KEY": process.env.NEXT_PUBLIC_EPAY_API_KEY || "",
       },
       body: JSON.stringify({
         ...data,
-        callback: "https://your-callback-url.com", // Replace with your callback URL
+        callback: process.env.NEXT_PUBLIC_CALLBACK_URL, // Replace with your callback URL
       }),
     });
     if (!response.ok) throw new Error("Failed to create withdraw");
@@ -93,7 +100,7 @@ class EpayAPI {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-API-KEY": process.env.EPAY_API_KEY || "",
+        "X-API-KEY": process.env.NEXT_PUBLIC_EPAY_API_KEY || "",
       },
     });
     if (!response.ok) throw new Error("Failed to fetch bank withdrawal");

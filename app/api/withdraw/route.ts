@@ -1,28 +1,35 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { loadTransactions, saveTransactions } from "@/lib/supabase";
+import { epayAPI } from "@/lib/epay-api";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { method, currency, amount, bankAccount, walletAddress } = body;
+    const {
+      method,
+      amount,
+      bankNameDest,
+      bankAccountNumberDest,
+      bankAccountNameDest,
+      walletAddress,
+      chainName,
+    } = body;
 
     // Validate required fields
-    if (!method || !currency || !amount) {
+    if (!method || !amount) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
-    const isProd = process.env.NODE_ENV === "production";
-    const accountPath = isProd
-      ? path.join("/tmp", "account.json")
-      : path.join(process.cwd(), "data", "account.json");
+    const accountData = await loadTransactions("epay", "account.json");
 
-    const accountContents = await fs.readFile(accountPath, "utf8");
-    const accountData = JSON.parse(accountContents);
+    let actualAmount = amount;
+    if (method === "vietqr") {
+      actualAmount = amount * 23000;
+    }
 
-    if (accountData.balances[currency] < Number.parseFloat(amount)) {
+    if (accountData.balances[0].available < Number.parseFloat(amount)) {
       return NextResponse.json(
         { error: "Insufficient balance" },
         { status: 400 }
@@ -31,67 +38,51 @@ export async function POST(request: Request) {
 
     // Calculate fees
     let fee = 0;
-    if (method === "vietqr") {
-      fee = Number.parseFloat(amount) * 0.001; // 0.1% fee
-    } else if (method === "crypto") {
-      const cryptoFees = {
-        BTC: 0.0005,
-        ETH: 0.005,
-        USDT: 1,
-        BNB: 0.001,
-      };
-      fee = cryptoFees[currency] || 0;
-    }
-
+    const transactionId = `WTH_${Date.now()}`;
     const withdrawData = {
-      transactionId: `WTH_${Date.now()}`,
+      transactionId,
       method,
-      currency,
+      currency: "USD",
       amount: Number.parseFloat(amount),
       fee,
-      netAmount: Number.parseFloat(amount) - fee,
       status: "pending",
       type: "withdraw",
       createdAt: new Date().toISOString(),
       estimatedCompletion: new Date(
         Date.now() + 2 * 60 * 60 * 1000
       ).toISOString(), // 2 hours
-      ...(method === "vietqr" &&
-        bankAccount && {
-          bankAccount: {
-            bankName: bankAccount.bankName,
-            accountNumber: bankAccount.accountNumber,
-            accountName: bankAccount.accountName,
-          },
-        }),
-      ...(method === "crypto" &&
-        walletAddress && {
-          walletAddress,
-          network:
-            currency === "USDT"
-              ? "TRC20"
-              : currency === "BNB"
-              ? "BSC"
-              : "Mainnet",
-        }),
+      ref: "",
     };
 
-    const transactionsPath = path.join(
-      process.cwd(),
-      "data",
+    if (method === "vietqr") {
+      const data = await epayAPI.createWithdraw({
+        amount: Number.parseFloat(actualAmount),
+        bankNameDest,
+        bankAccountNumberDest,
+        bankAccountNameDest,
+        ref: transactionId,
+        mt5Id: "123456",
+      });
+      withdrawData.ref = data.code;
+    } else {
+      const data = await epayAPI.createWithdrawalCrypto({
+        chainName: chainName,
+        customerId: "1",
+        mt5Id: "1",
+        usdAmount: amount,
+        toAddress: walletAddress,
+        ref: transactionId,
+      });
+      withdrawData.ref = data.code;
+    }
+
+    const transactionsData = await loadTransactions(
+      "epay",
       "transactions.json"
     );
-    const transactionsContents = await fs.readFile(transactionsPath, "utf8");
-    const transactionsData = JSON.parse(transactionsContents);
 
     transactionsData.transactions.unshift(withdrawData);
-    await fs.writeFile(
-      transactionsPath,
-      JSON.stringify(transactionsData, null, 2)
-    );
-
-    accountData.balances[currency] -= Number.parseFloat(amount);
-    await fs.writeFile(accountPath, JSON.stringify(accountData, null, 2));
+    await saveTransactions(transactionsData, "epay", "transactions.json");
 
     return NextResponse.json(withdrawData);
   } catch (error) {

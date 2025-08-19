@@ -1,7 +1,35 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { epayAPI } from "@/lib/epay-api";
+import { supabase } from "@/lib/supabase"; // đã config ở lib/supabase.ts
+
+const BUCKET = "epay";
+const FILE_PATH = "transactions.json";
+
+async function loadTransactions() {
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .download(FILE_PATH);
+
+  if (error) {
+    if (error.message.includes("not found")) {
+      return { transactions: [] }; // chưa có file thì khởi tạo
+    }
+    throw error;
+  }
+
+  const text = await data.text();
+  return JSON.parse(text);
+}
+
+async function saveTransactions(transactions: any) {
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(FILE_PATH, JSON.stringify(transactions), {
+      upsert: true,
+      contentType: "application/json",
+    });
+  if (error) throw error;
+}
 
 export async function POST(request: Request) {
   try {
@@ -15,30 +43,31 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const isProd = process.env.NODE_ENV === "production";
-    const transactionsPath = isProd
-      ? path.join("/tmp", "transactions.json")
-      : path.join(process.cwd(), "data", "transactions.json");
-    const transactionsContents = await fs.readFile(transactionsPath, "utf8");
-    const transactionsData = JSON.parse(transactionsContents);
 
+    // Load transactions từ Supabase Storage
+    const transactionsData = await loadTransactions();
+    let actualAmount = amount;
+    if (method === "vietqr") {
+      actualAmount = amount / 23000;
+    }
     // Mock deposit processing
     const transactionId = `DEP_${Date.now()}`;
     const depositData = {
-      transactionId: transactionId,
+      transactionId,
       method,
       mt5ID: "123456",
       currency: "USD",
-      amount: Number.parseFloat(amount),
+      amount: Number.parseFloat(actualAmount.toFixed(2)),
       status: "pending",
       type: "deposit",
       createdAt: new Date().toISOString(),
-      estimatedCompletion: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes
+      estimatedCompletion: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       hashId: "",
       depositAddress: "",
+      ref: "",
     };
 
-    // For VietQR, generate QR code data
+    // VietQR → gọi Epay API
     if (method === "vietqr") {
       const data = await epayAPI.createDeposit({
         amount: Number.parseFloat(amount),
@@ -46,18 +75,12 @@ export async function POST(request: Request) {
         ref: transactionId,
       });
       depositData.hashId = data.hashId;
+      depositData.ref = data.code;
     }
 
-    // For crypto, generate deposit address
-    if (method === "crypto") {
-      depositData.depositAddress = walletAddress;
-    }
-
+    // Lưu vào Supabase Storage
     transactionsData.transactions.unshift(depositData);
-    await fs.writeFile(
-      transactionsPath,
-      JSON.stringify(transactionsData, null, 2)
-    );
+    await saveTransactions(transactionsData);
 
     return NextResponse.json(depositData);
   } catch (error) {

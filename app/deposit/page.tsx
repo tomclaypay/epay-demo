@@ -23,12 +23,15 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { useLanguage } from "@/contexts/language-context";
 import { apiService } from "@/lib/api-service";
+import { epayAPI } from "@/lib/epay-api";
 
 export default function DepositPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [selectedCrypto, setSelectedCrypto] = useState("");
+  const [selectedCrypto, setSelectedCrypto] = useState("TRON");
   const [amount, setAmount] = useState("");
   const [actualAmount, setActualAmount] = useState("");
+  const [img, setImg] = useState("");
+  const [walletAddress, setWalletAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
 
@@ -54,10 +57,9 @@ export default function DepositPage() {
   ];
 
   const cryptoOptions = [
-    { value: "USDT", label: "USDT (TRC20)" },
-    { value: "BTC", label: "Bitcoin (BTC)" },
-    { value: "ETH", label: "Ethereum (ETH)" },
-    { value: "BNB", label: "BNB (BSC)" },
+    { value: "BSC", label: "BNB Smart Chain (BEP20)" },
+    { value: "TRON", label: "Tron (TRC20)" },
+    { value: "ETHEREUM", label: "Ethereum (ERC20)" },
   ];
 
   const handleOptionSelect = (optionId: string) => {
@@ -73,20 +75,38 @@ export default function DepositPage() {
   const onSubmit = async () => {
     setIsLoading(true);
     try {
-      const response = await apiService.createDeposit({
-        method: selectedOption || "vietqr",
-        amount: Number(amount),
-      });
+      if (selectedOption === "vietqr") {
+        const response = await apiService.createDeposit({
+          method: selectedOption || "vietqr",
+          amount: Number(amount),
+        });
+        window.open(
+          process.env.NEXT_PUBLIC_PAYMENT_URL + response.hashId,
+          "_blank",
+          "noreferrer"
+        );
+        setSelectedOption(null);
+      } else {
+        const data = await epayAPI.getWalletAddress({
+          chainName: selectedCrypto,
+          customerId: "1",
+          mt5Id: "1",
+        });
+        setWalletAddress(data.address);
+        const res = await fetch("/api/qr", {
+          method: "POST",
+          body: JSON.stringify({ text: data.address, size: 300 }),
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+          alert("Generate QR failed");
+          return;
+        }
+        const blob = await res.blob();
+        setImg(URL.createObjectURL(blob));
+      }
       setIsLoading(false);
-      window.open(
-        process.env.NEXT_PUBLIC_PAYMENT_URL + response.hashId,
-        "_blank",
-        "noreferrer"
-      );
-      console.log("Deposit successful:", response.data);
-      setSelectedOption(null);
       setAmount("");
-      setSelectedCrypto("");
     } catch (error) {
       console.error("Deposit failed:", error);
     }
@@ -120,13 +140,13 @@ export default function DepositPage() {
           <CardContent className="space-y-4">
             {selectedOption === "crypto" && (
               <div className="space-y-2">
-                <Label htmlFor="crypto-select">{t("selectCurrency")}</Label>
+                <Label htmlFor="crypto-select">{t("network")}</Label>
                 <Select
                   value={selectedCrypto}
                   onValueChange={setSelectedCrypto}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t("selectCrypto")} />
+                    <SelectValue placeholder={t("selectNetwork")} />
                   </SelectTrigger>
                   <SelectContent>
                     {cryptoOptions.map((crypto) => (
@@ -138,25 +158,23 @@ export default function DepositPage() {
                 </Select>
               </div>
             )}
+            {selectedOption === "vietqr" && (
+              <div className="space-y-2">
+                <Label htmlFor="amount">{t("amount")}</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  placeholder={t("enterVNDAmount")}
+                  value={amount}
+                  onChange={(e) => {
+                    setAmount(e.target.value);
+                    const actualAmount = Number(e.target.value) / 23000;
+                    setActualAmount(actualAmount.toFixed(2));
+                  }}
+                />
+              </div>
+            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="amount">{t("amount")}</Label>
-              <Input
-                id="amount"
-                type="number"
-                placeholder={
-                  selectedOption === "crypto"
-                    ? t("enterCryptoAmount")
-                    : t("enterVNDAmount")
-                }
-                value={amount}
-                onChange={(e) => {
-                  setAmount(e.target.value);
-                  const actualAmount = Number(e.target.value) / 23000;
-                  setActualAmount(actualAmount.toFixed(2));
-                }}
-              />
-            </div>
             {selectedOption === "vietqr" && (
               <div className="space-y-2">
                 <Label htmlFor="actualAmount">{t("usdAmount")} </Label>
@@ -196,6 +214,29 @@ export default function DepositPage() {
             </Button>
           </CardContent>
         </Card>
+        {selectedOption === "crypto" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("depositWalletAddress")}</CardTitle>
+              <CardDescription>
+                {t("depositWalletAddressDescription")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {img && (
+                <div className="flex flex-col items-center justify-center">
+                  <img src={img} alt="qr" width={300} height={300} />
+                  <p className="text-center">
+                    {t("walletAddress")}: {walletAddress}
+                  </p>
+                  <a href={img} download="qr.png">
+                    Tải ảnh QR
+                  </a>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   };

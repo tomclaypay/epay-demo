@@ -22,12 +22,18 @@ import { ArrowLeftIcon, CreditCardIcon, CoinsIcon } from "lucide-react";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { useLanguage } from "@/contexts/language-context";
+import { apiService } from "@/lib/api-service";
 
 export default function WithdrawPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [selectedCrypto, setSelectedCrypto] = useState("");
+  const [selectedCrypto, setSelectedCrypto] = useState("TRON");
   const [amount, setAmount] = useState("");
+  const [vndAmount, setVndAmount] = useState("");
   const [address, setAddress] = useState("");
+  const [bankNameDest, setBankNameDest] = useState("");
+  const [bankAccountNumberDest, setBankAccountNumberDest] = useState("");
+  const [bankAccountNameDest, setBankAccountNameDest] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
 
   const withdrawOptions = [
@@ -52,10 +58,9 @@ export default function WithdrawPage() {
   ];
 
   const cryptoOptions = [
-    { value: "USDT", label: "USDT (TRC20)" },
-    { value: "BTC", label: "Bitcoin (BTC)" },
-    { value: "ETH", label: "Ethereum (ETH)" },
-    { value: "BNB", label: "BNB (BSC)" },
+    { value: "BSC", label: "BNB Smart Chain (BEP20)" },
+    { value: "TRON", label: "Tron (TRC20)" },
+    { value: "ETHEREUM", label: "Ethereum (ERC20)" },
   ];
 
   const handleOptionSelect = (optionId: string) => {
@@ -67,6 +72,37 @@ export default function WithdrawPage() {
     setAmount("");
     setSelectedCrypto("");
     setAddress("");
+  };
+
+  const onSubmit = async () => {
+    setIsLoading(true);
+    try {
+      if (selectedOption === "vietqr") {
+        // Handle VietQR withdrawal
+        await apiService.createWithdraw({
+          method: selectedOption || "vietqr",
+          amount: Number(amount),
+          bankAccountNameDest,
+          bankAccountNumberDest,
+          bankNameDest,
+        });
+      } else {
+        // Handle crypto withdrawal
+        await apiService.createWithdraw({
+          method: selectedOption || "crypto",
+          amount: Number(amount),
+          walletAddress: address,
+          chainName: selectedCrypto,
+        });
+      }
+      setAmount("");
+      setSelectedCrypto("");
+      setAddress("");
+      setSelectedOption(null);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const renderWithdrawForm = () => {
@@ -97,13 +133,13 @@ export default function WithdrawPage() {
           <CardContent className="space-y-4">
             {selectedOption === "crypto" && (
               <div className="space-y-2">
-                <Label htmlFor="crypto-select">Chọn loại cryptocurrency</Label>
+                <Label htmlFor="crypto-select">{t("network")}</Label>
                 <Select
                   value={selectedCrypto}
                   onValueChange={setSelectedCrypto}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Chọn cryptocurrency" />
+                    <SelectValue placeholder={t("selectNetwork")} />
                   </SelectTrigger>
                   <SelectContent>
                     {cryptoOptions.map((crypto) => (
@@ -127,9 +163,29 @@ export default function WithdrawPage() {
                     : t("enterVNDAmount")
                 }
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setAmount(value);
+                  if (selectedOption === "vietqr") {
+                    const vndAmount = Number(value) * 23000;
+                    setVndAmount(vndAmount.toFixed(0));
+                  }
+                }}
               />
             </div>
+
+            {selectedOption === "vietqr" && (
+              <div className="space-y-2">
+                <Label htmlFor="amount">{t("withdrawAmount")} VND</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  placeholder={t("enterVNDAmount")}
+                  value={vndAmount}
+                  disabled
+                />
+              </div>
+            )}
 
             {selectedOption === "crypto" ? (
               <div className="space-y-2">
@@ -145,7 +201,7 @@ export default function WithdrawPage() {
               <>
                 <div className="space-y-2">
                   <Label htmlFor="bank">{t("bank")}</Label>
-                  <Select>
+                  <Select value={bankNameDest} onValueChange={setBankNameDest}>
                     <SelectTrigger>
                       <SelectValue placeholder={t("selectBank")} />
                     </SelectTrigger>
@@ -162,6 +218,8 @@ export default function WithdrawPage() {
                   <Input
                     id="account-number"
                     placeholder={t("enterBankAccount")}
+                    value={bankAccountNumberDest}
+                    onChange={(e) => setBankAccountNumberDest(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -169,12 +227,19 @@ export default function WithdrawPage() {
                   <Input
                     id="account-name"
                     placeholder={t("enterAccountHolder")}
+                    value={bankAccountNameDest}
+                    onChange={(e) => setBankAccountNameDest(e.target.value)}
                   />
                 </div>
               </>
             )}
 
-            <Button className="w-full" size="lg">
+            <Button
+              disabled={isLoading}
+              onClick={onSubmit}
+              className="w-full"
+              size="lg"
+            >
               {t("confirmWithdraw")}
             </Button>
           </CardContent>

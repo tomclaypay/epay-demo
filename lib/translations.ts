@@ -23,9 +23,9 @@ export const translations = {
     crypto: "Crypto",
     backToOptions: "Quay lại",
     depositInfo: "Thông tin nạp tiền",
-    selectCrypto: "Chọn loại tiền",
+    selectCrypto: "Chọn mang lưới",
     enterCryptoAmount: "Nhập số lượng",
-    enterVNDAmount: "Nhập số tiền VND",
+    enterVNDAmount: "Nhập số tiền",
     selectBank: "Chọn ngân hàng",
     depositViaBankTransfer: "Nạp tiền vào tài khoản qua ngân hàng",
     depositViaCrypto: "Nạp tiền qua cryptocurrency",
@@ -41,8 +41,11 @@ export const translations = {
     confirmWithdraw: "Xác nhận rút tiền",
     selectWithdrawMethod: "Chọn phương thức rút tiền phù hợp",
     usdAmount: "Số tiền USD",
+    depositWalletAddress: "Địa chỉ ví nạp tiền",
+    depositWalletAddressDescription:
+      "Vui lòng nạp đúng mạng lưới đã chọn, nếu nạp sai mạng lưới sẽ bị mất",
     // Forms
-    selectCurrency: "Chọn loại tiền",
+    selectNetwork: "Chọn mạng lưới",
     amount: "Số tiền",
     bankAccount: "Số tài khoản ngân hàng",
     bankName: "Tên ngân hàng",
@@ -105,9 +108,12 @@ export const translations = {
     confirmWithdraw: "Confirm withdraw",
     selectWithdrawMethod: "Select withdraw method",
     usdAmount: "USD amount",
+    depositWalletAddress: "Deposit wallet address",
+    depositWalletAddressDescription:
+      "Please load the correct network selected, if you load the wrong network it will be lost.",
 
     // Forms
-    selectCurrency: "Select currency",
+    selectNetwork: "Select network",
     amount: "Amount",
     bankAccount: "Bank account number",
     bankName: "Bank name",

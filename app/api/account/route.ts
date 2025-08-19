@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { loadTransactions } from "@/lib/supabase";
 
 export async function GET() {
   try {
-    const filePath = path.join(process.cwd(), "data", "account.json");
-    const fileContents = await fs.readFile(filePath, "utf8");
-    const accountData = JSON.parse(fileContents);
-
+    const accountData = await loadTransactions("epay", "account.json");
     return NextResponse.json(accountData);
   } catch (error) {
     console.error("Error reading account data:", error);

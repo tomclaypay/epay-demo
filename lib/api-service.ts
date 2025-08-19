@@ -79,20 +79,14 @@ class ApiService {
   }
 
   // Withdraw APIs
-  async withdraw(data: {
-    method: string;
-    currency: string;
-    amount: number;
-    details?: any;
-  }) {
-    return this.createWithdraw(data);
-  }
-
   async createWithdraw(data: {
     method: string;
-    currency: string;
     amount: number;
-    details?: any;
+    bankNameDest?: string;
+    bankAccountNumberDest?: string;
+    bankAccountNameDest?: string;
+    walletAddress?: string;
+    chainName?: string;
   }) {
     const response = await fetch(`${this.baseUrl}/withdraw`, {
       method: "POST",
