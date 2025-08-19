@@ -4,7 +4,7 @@ import path from "path";
 
 export async function GET() {
   try {
-    const filePath = path.join(process.cwd(), "tmp", "payment-methods.json");
+    const filePath = path.join("/tmp", "payment-methods.json");
     const fileContents = await fs.readFile(filePath, "utf8");
     const paymentMethods = JSON.parse(fileContents);
 

@@ -14,8 +14,11 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    const isProd = process.env.NODE_ENV === "production";
+    const accountPath = isProd
+      ? path.join("/tmp", "account.json")
+      : path.join(process.cwd(), "data", "account.json");
 
-    const accountPath = path.join(process.cwd(), "tmp", "account.json");
     const accountContents = await fs.readFile(accountPath, "utf8");
     const accountData = JSON.parse(accountContents);
 

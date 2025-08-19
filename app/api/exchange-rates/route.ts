@@ -4,7 +4,10 @@ import path from "path";
 
 export async function GET() {
   try {
-    const filePath = path.join(process.cwd(), "tmp", "exchange-rates.json");
+    const isProd = process.env.NODE_ENV === "production";
+    const filePath = isProd
+      ? path.join("/tmp", "exchange-rates.json")
+      : path.join(process.cwd(), "data", "exchange-rates.json");
     const fileContents = await fs.readFile(filePath, "utf8");
     const exchangeRates = JSON.parse(fileContents);
 

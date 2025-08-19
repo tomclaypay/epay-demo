@@ -15,12 +15,10 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    const transactionsPath = path.join(
-      process.cwd(),
-      "tmp",
-      "transactions.json"
-    );
+    const isProd = process.env.NODE_ENV === "production";
+    const transactionsPath = isProd
+      ? path.join("/tmp", "transactions.json")
+      : path.join(process.cwd(), "data", "transactions.json");
     const transactionsContents = await fs.readFile(transactionsPath, "utf8");
     const transactionsData = JSON.parse(transactionsContents);
 

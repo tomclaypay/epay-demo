@@ -9,11 +9,7 @@ export async function GET(request: Request) {
     const limit = Number.parseInt(searchParams.get("limit") || "20");
     const offset = Number.parseInt(searchParams.get("offset") || "0");
 
-    const transactionsPath = path.join(
-      process.cwd(),
-      "tmp",
-      "transactions.json"
-    );
+    const transactionsPath = path.join("/tmp", "transactions.json");
     const transactionsContents = await fs.readFile(transactionsPath, "utf8");
     const transactionsData = JSON.parse(transactionsContents);
 
