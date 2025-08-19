@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     const transactionsPath = path.join(
       process.cwd(),
-      "data",
+      "tmp",
       "transactions.json"
     );
     const transactionsContents = await fs.readFile(transactionsPath, "utf8");
