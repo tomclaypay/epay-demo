@@ -1,0 +1,54 @@
+{
+  "app": {
+    "name": "Exness Exchange",
+    "version": "1.0.0",
+    "maintenance_mode": false,
+    "supported_languages": ["vi", "en"],
+    "default_language": "vi"
+  },
+  "features": {
+    "deposit_enabled": true,
+    "withdraw_enabled": true,
+    "trading_enabled": true,
+    "kyc_required": true
+  },
+  "limits": {
+    "unverified_user": {
+      "daily_deposit": 1000000,
+      "daily_withdraw": 500000
+    },
+    "verified_user": {
+      "daily_deposit": 50000000,
+      "daily_withdraw": 20000000
+    },
+    "vip_user": {
+      "daily_deposit": 200000000,
+      "daily_withdraw": 100000000
+    }
+  },
+  "fees": {
+    "vnd_withdraw": 11000,
+    "crypto_withdraw_percentage": 0.1,
+    "crypto_min_fee": 1,
+    "trading_fee": 0.1
+  },
+  "networks": {
+    "USDT": {
+      "TRC20": {
+        "name": "Tron (TRC20)",
+        "fee": 1,
+        "min_confirmations": 1
+      },
+      "ERC20": {
+        "name": "Ethereum (ERC20)",
+        "fee": 10,
+        "min_confirmations": 12
+      },
+      "BEP20": {
+        "name": "BSC (BEP20)",
+        "fee": 0.8,
+        "min_confirmations": 15
+      }
+    }
+  }
+}
