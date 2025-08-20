@@ -23,6 +23,8 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { useLanguage } from "@/contexts/language-context";
 import { apiService } from "@/lib/api-service";
+import { TransactionSuccessModal } from "@/components/transaction-success-modal";
+import { useRouter } from "next/navigation";
 
 export default function WithdrawPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -34,7 +36,10 @@ export default function WithdrawPage() {
   const [bankAccountNumberDest, setBankAccountNumberDest] = useState("");
   const [bankAccountNameDest, setBankAccountNameDest] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [successTransaction, setSuccessTransaction] = useState<any>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { t } = useLanguage();
+  const router = useRouter();
 
   const withdrawOptions = [
     {
@@ -72,6 +77,7 @@ export default function WithdrawPage() {
     setAmount("");
     setSelectedCrypto("");
     setAddress("");
+    setShowSuccessModal(false);
   };
 
   const onSubmit = async () => {
@@ -95,6 +101,14 @@ export default function WithdrawPage() {
           chainName: selectedCrypto,
         });
       }
+      setSuccessTransaction({
+        method: selectedOption,
+        amount: Number(amount),
+        walletAddress: address,
+        chainName: selectedCrypto,
+        type: "withdraw",
+      });
+      setShowSuccessModal(true);
       setAmount("");
       setSelectedCrypto("");
       setAddress("");
@@ -103,6 +117,15 @@ export default function WithdrawPage() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessTransaction(null);
+  };
+
+  const handleViewHistory = () => {
+    router.push("/transactions");
   };
 
   const renderWithdrawForm = () => {
@@ -319,6 +342,13 @@ export default function WithdrawPage() {
           )}
         </main>
       </div>
+      <TransactionSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+        transaction={successTransaction}
+        onViewHistory={handleViewHistory}
+        onBack={handleBack}
+      />
     </div>
   );
 }

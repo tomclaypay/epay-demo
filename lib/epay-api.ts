@@ -39,13 +39,6 @@ class EpayAPI {
         callback: process.env.NEXT_PUBLIC_CALLBACK_URL, // Replace with your callback URL
       }),
     });
-    console.log(
-      "data",
-      JSON.stringify({
-        ...data,
-        callback: process.env.NEXT_PUBLIC_CALLBACK_URL, // Replace with your callback URL
-      })
-    );
     if (!response.ok) throw new Error("Failed to create withdraw");
     return response.json();
   }

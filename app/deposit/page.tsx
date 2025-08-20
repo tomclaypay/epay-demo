@@ -24,6 +24,8 @@ import { Sidebar } from "@/components/sidebar";
 import { useLanguage } from "@/contexts/language-context";
 import { apiService } from "@/lib/api-service";
 import { epayAPI } from "@/lib/epay-api";
+import { TransactionSuccessModal } from "@/components/transaction-success-modal";
+import { useRouter } from "next/navigation";
 
 export default function DepositPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -33,6 +35,10 @@ export default function DepositPage() {
   const [img, setImg] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [successTransaction, setSuccessTransaction] = useState<any>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showWalletAddress, setShowWalletAddress] = useState(false);
+  const router = useRouter();
   const { t } = useLanguage();
 
   const depositOptions = [
@@ -69,7 +75,20 @@ export default function DepositPage() {
   const handleBack = () => {
     setSelectedOption(null);
     setAmount("");
-    setSelectedCrypto("");
+    setSelectedCrypto("TRON");
+    setShowSuccessModal(false);
+    setSuccessTransaction(null);
+    setShowWalletAddress(false);
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessTransaction(null);
+    setShowWalletAddress(false);
+  };
+
+  const handleViewHistory = () => {
+    router.push("/transactions");
   };
 
   const onSubmit = async () => {
@@ -104,6 +123,14 @@ export default function DepositPage() {
         }
         const blob = await res.blob();
         setImg(URL.createObjectURL(blob));
+        setSuccessTransaction({
+          method: selectedOption,
+          amount: Number(amount),
+          walletAddress: data.address,
+          chainName: selectedCrypto,
+          type: "deposit",
+        });
+        setShowWalletAddress(true);
       }
       setIsLoading(false);
       setAmount("");
@@ -217,7 +244,7 @@ export default function DepositPage() {
             </Button>
           </CardContent>
         </Card>
-        {selectedOption === "crypto" && (
+        {selectedOption === "crypto" && showWalletAddress && (
           <Card>
             <CardHeader>
               <CardTitle>{t("depositWalletAddress")}</CardTitle>
@@ -226,6 +253,9 @@ export default function DepositPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <Button size="lg" onClick={() => setShowSuccessModal(true)}>
+                {t("moneyTransferred")}
+              </Button>
               {img && (
                 <div className="flex flex-col items-center justify-center">
                   <img src={img} alt="qr" width={300} height={300} />
@@ -310,6 +340,13 @@ export default function DepositPage() {
           )}
         </main>
       </div>
+      <TransactionSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+        transaction={successTransaction}
+        onViewHistory={handleViewHistory}
+        onBack={handleBack}
+      />
     </div>
   );
 }

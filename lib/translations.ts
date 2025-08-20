@@ -29,6 +29,7 @@ export const translations = {
     selectBank: "Chọn ngân hàng",
     depositViaBankTransfer: "Nạp tiền vào tài khoản qua ngân hàng",
     depositViaCrypto: "Nạp tiền qua cryptocurrency",
+    moneyTransferred: "Đã chuyển tiền",
 
     withdrawViaBankTransfer: "Rút tiền về tài khoản ngân hàng",
     withdrawViaCrypto: "Rút tiền qua cryptocurrency",
@@ -99,6 +100,26 @@ export const translations = {
     error: "Lỗi",
     paymentLink: "Đường dẫn thanh toán",
     copySuccess: "Sao chép thành công",
+
+    depositSuccess: "Nạp Tiền Thành Công",
+    withdrawSuccess: "Rút Tiền Thành Công",
+    depositSuccessMessage:
+      "Giao dịch nạp tiền của bạn đã được xử lý thành công",
+    withdrawSuccessMessage:
+      "Giao dịch rút tiền của bạn đã được xử lý thành công",
+    estimatedCompletion: "Dự kiến hoàn thành",
+    depositProcessingNote:
+      "Tiền sẽ được cộng vào tài khoản của bạn trong thời gian sớm nhất",
+    withdrawProcessingNote:
+      "Tiền sẽ được chuyển đến tài khoản của bạn trong thời gian dự kiến",
+    viewTransactionHistory: "Xem lịch sử giao dịch",
+    backToDeposit: "Quay lại nạp tiền",
+    backToWithdraw: "Quay lại rút tiền",
+    needHelp: "Cần hỗ trợ?",
+    contactSupport: "Liên hệ hỗ trợ",
+    copy: "Sao chép",
+    copied: "đã sao chép",
+    copyFailed: "Sao chép thất bại",
   },
   en: {
     // Header
@@ -130,6 +151,7 @@ export const translations = {
     selectBank: "Select bank",
     depositViaBankTransfer: "Deposit to bank account",
     depositViaCrypto: "Deposit to wallet",
+    moneyTransferred: "Money transferred",
 
     withdrawViaBankTransfer: "Withdraw to bank account",
     withdrawViaCrypto: "Withdraw to wallet",
@@ -201,6 +223,26 @@ export const translations = {
     error: "Error",
     paymentLink: "Payment Link",
     copySuccess: "Copied to clipboard",
+
+    depositSuccess: "Deposit Successful",
+    withdrawSuccess: "Withdrawal Successful",
+    depositSuccessMessage:
+      "Your deposit transaction has been processed successfully",
+    withdrawSuccessMessage:
+      "Your withdrawal transaction has been processed successfully",
+    estimatedCompletion: "Estimated completion",
+    depositProcessingNote:
+      "Funds will be added to your account as soon as possible",
+    withdrawProcessingNote:
+      "Funds will be transferred to your account within the estimated time",
+    viewTransactionHistory: "View transaction history",
+    backToDeposit: "Back to deposit",
+    backToWithdraw: "Back to withdraw",
+    needHelp: "Need help?",
+    contactSupport: "Contact support",
+    copy: "Copy",
+    copied: "copied",
+    copyFailed: "Copy failed",
   },
 };
 
