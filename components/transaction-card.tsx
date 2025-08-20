@@ -40,7 +40,7 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "completed":
+      case "success":
         return <CheckCircleIcon className="h-4 w-4 text-green-600" />;
       case "failed":
         return <XCircleIcon className="h-4 w-4 text-red-600" />;
@@ -51,7 +51,7 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case "completed":
+      case "success":
         return "default" as const;
       case "failed":
         return "destructive" as const;
@@ -62,7 +62,7 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "completed":
+      case "success":
         return t("completed");
       case "failed":
         return t("failed");

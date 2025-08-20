@@ -210,6 +210,9 @@ export default function DepositPage() {
               size="lg"
               onClick={onSubmit}
             >
+              {isLoading && (
+                <div className="animate-spin rounded-full h-2 w-2 border-b-2"></div>
+              )}
               {t("submit")}
             </Button>
           </CardContent>

@@ -240,6 +240,9 @@ export default function WithdrawPage() {
               className="w-full"
               size="lg"
             >
+              {isLoading && (
+                <div className="animate-spin rounded-full h-2 w-2 border-b-2"></div>
+              )}
               {t("confirmWithdraw")}
             </Button>
           </CardContent>
