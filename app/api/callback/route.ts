@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     await saveTransactions(transactionsData, "epay", "transactions.json");
+    await saveTransactions(accountData, "epay", "account.json");
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (e: any) {

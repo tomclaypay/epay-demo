@@ -46,7 +46,7 @@ export default function TransactionsPage() {
 
   const stats = transactions?.reduce(
     (acc, transaction) => {
-      if (transaction.status === "completed") {
+      if (transaction.status === "success") {
         if (transaction.type === "deposit") {
           acc.totalDeposits += transaction.amount;
           acc.depositCount += 1;
