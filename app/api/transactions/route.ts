@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { loadTransactions } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   try {
@@ -9,9 +10,10 @@ export async function GET(request: Request) {
     const limit = Number.parseInt(searchParams.get("limit") || "20");
     const offset = Number.parseInt(searchParams.get("offset") || "0");
 
-    const transactionsPath = path.join("/tmp", "transactions.json");
-    const transactionsContents = await fs.readFile(transactionsPath, "utf8");
-    const transactionsData = JSON.parse(transactionsContents);
+    const transactionsData = await loadTransactions(
+      "epay",
+      "transactions.json"
+    );
 
     // Filter by type if specified
     let filteredTransactions = transactionsData.transactions;

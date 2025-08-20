@@ -1,30 +1,42 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react"
-import { translations, type Language, type TranslationKey } from "@/lib/translations"
+import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  translations,
+  type Language,
+  type TranslationKey,
+} from "@/lib/translations";
+import { Toaster } from "@/components/ui/sonner";
 
 interface LanguageContextType {
-  language: Language
-  setLanguage: (lang: Language) => void
-  t: (key: TranslationKey) => string
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: TranslationKey) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("vi")
+  const [language, setLanguage] = useState<Language>("vi");
 
   const t = (key: TranslationKey): string => {
-    return translations[language][key] || key
-  }
+    return translations[language][key] || key;
+  };
 
-  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+      <Toaster />
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext)
+  const context = useContext(LanguageContext);
   if (context === undefined) {
-    throw new Error("useLanguage must be used within a LanguageProvider")
+    throw new Error("useLanguage must be used within a LanguageProvider");
   }
-  return context
+  return context;
 }

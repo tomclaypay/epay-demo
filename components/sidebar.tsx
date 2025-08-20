@@ -49,7 +49,7 @@ export function Sidebar() {
       id: "history",
       label: t("transactionHistory"),
       icon: ClockIcon,
-      href: "/history",
+      href: "/transactions",
     },
     {
       id: "wallet",
