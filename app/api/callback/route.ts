@@ -1,6 +1,5 @@
 import { loadTransactions, saveTransactions } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
-import QRCode from "qrcode";
 
 // POST { text: string, size?: number }
 export async function POST(req: NextRequest) {
