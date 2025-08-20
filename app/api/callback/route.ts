@@ -35,7 +35,6 @@ export async function POST(req: NextRequest) {
       "epay",
       "transactions.json"
     );
-    console.log("transactionsData", transactionsData);
 
     const accountData = await loadTransactions("epay", "account.json");
 
@@ -43,30 +42,46 @@ export async function POST(req: NextRequest) {
       (transaction) => transaction.ref === orderCode
     );
 
-    if (!transaction) {
-      return NextResponse.json(
-        { error: "Transaction not found" },
-        { status: 404 }
-      );
-    }
-
-    if (transaction.status !== "pending") {
+    if (transaction.status !== "pending" && !isCrypto) {
       return NextResponse.json(
         { error: "Transaction already processed" },
         { status: 400 }
       );
     }
+    if (isCrypto) {
+      const depositData = {
+        transactionId: `DEP_${Date.now()}`,
+        method: "crypto",
+        mt5ID: "123456",
+        currency: "USD",
+        amount: Number.parseFloat(usdAmount.toFixed(2)),
+        status: "success",
+        type: "deposit",
+        createdAt: new Date().toISOString(),
+        estimatedCompletion: new Date(
+          Date.now() + 30 * 60 * 1000
+        ).toISOString(),
+        hashId: "",
+        depositAddress: "",
+        ref: "",
+      };
+      transactionsData.transactions.unshift(depositData);
+    }
 
     if (orderStatus === "SUCCEED") {
-      console.log("accountData", accountData);
       transaction.status = "success";
       if (orderType === "DEPOSIT") {
-        accountData.balances[0].available += Number.parseFloat(
-          transaction.amount
-        );
+        if (isCrypto) {
+          accountData.balances[0].available += Number.parseFloat(
+            usdAmount.toFixed(2)
+          );
+        } else
+          accountData.balances[0].available += Number.parseFloat(
+            transaction.amount.toFixed(2)
+          );
       } else {
         accountData.balances[0].available -= Number.parseFloat(
-          transaction.amount
+          transaction.amount.toFixed(2)
         );
       }
     } else if (orderStatus === "CANCELED") {

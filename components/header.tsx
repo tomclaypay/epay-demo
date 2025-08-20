@@ -49,7 +49,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-background">
             <span className="text-sm font-medium">
-              {balance} {t("balance")}
+              {balance.toFixed(2)} {t("balance")}
             </span>
           </Badge>
         </div>
