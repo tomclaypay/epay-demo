@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
           transaction.amount
         );
       } else {
-        accountData.balances["USD"].available -= Number.parseFloat(
+        accountData.balances[0].available -= Number.parseFloat(
           transaction.amount
         );
       }
