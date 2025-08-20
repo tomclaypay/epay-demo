@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     console.log("orderId", orderId);
 
-    if (!orderId || !orderType || !orderRef || !orderCode || !orderStatus) {
+    if (!orderId || !orderType || !orderCode || !orderStatus) {
       return NextResponse.json({ error: "Missing text" }, { status: 400 });
     }
 
