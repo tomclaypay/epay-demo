@@ -18,8 +18,6 @@ export async function POST(req: NextRequest) {
       secretKey,
     } = await req.json();
 
-    console.log("orderId", orderId);
-
     if (!orderId || !orderType || !orderCode || !orderStatus) {
       return NextResponse.json({ error: "Missing text" }, { status: 400 });
     }
@@ -42,13 +40,14 @@ export async function POST(req: NextRequest) {
       (transaction) => transaction.ref === orderCode
     );
 
-    if (transaction.status !== "pending" && !isCrypto) {
+    if (transaction && transaction.status !== "pending" && !isCrypto) {
       return NextResponse.json(
         { error: "Transaction already processed" },
         { status: 400 }
       );
     }
     if (isCrypto) {
+      console.log("isCrypto", isCrypto);
       const depositData = {
         transactionId: `DEP_${Date.now()}`,
         method: "crypto",
@@ -69,32 +68,37 @@ export async function POST(req: NextRequest) {
     }
 
     if (orderStatus === "SUCCEED") {
-      transaction.status = "success";
       if (orderType === "DEPOSIT") {
         if (isCrypto) {
           accountData.balances[0].available += Number.parseFloat(
             usdAmount.toFixed(2)
           );
-        } else
+        } else {
+          transaction.updatedAt = new Date().toISOString();
+          transaction.status = "success";
           accountData.balances[0].available += Number.parseFloat(
             transaction.amount.toFixed(2)
           );
+        }
       } else {
         accountData.balances[0].available -= Number.parseFloat(
           transaction.amount.toFixed(2)
         );
+        transaction.updatedAt = new Date().toISOString();
+        transaction.status = "success";
       }
     } else if (orderStatus === "CANCELED") {
       transaction.status = "cancel";
     }
 
-    transaction.updatedAt = new Date().toISOString();
-    const transactionId = transaction.transactionId;
-    const index = transactionsData.transactions.findIndex(
-      (transaction) => transaction.transactionId === transactionId
-    );
-    if (index !== -1) {
-      transactionsData.transactions[index] = transaction;
+    if (transaction) {
+      const transactionId = transaction.transactionId;
+      const index = transactionsData.transactions.findIndex(
+        (transaction) => transaction.transactionId === transactionId
+      );
+      if (index !== -1) {
+        transactionsData.transactions[index] = transaction;
+      }
     }
 
     await saveTransactions(transactionsData, "epay", "transactions.json");
