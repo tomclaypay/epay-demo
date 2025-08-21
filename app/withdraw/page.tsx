@@ -48,7 +48,7 @@ export default function WithdrawPage() {
       icon: CreditCardIcon,
       description: t("withdrawViaBankTransfer"),
       processingTime: "1 - 3 " + t("workingDays"),
-      fee: "1%",
+      fee: "0%",
       limits: "50 - 50,000 USD",
     },
     {
