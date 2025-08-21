@@ -57,7 +57,7 @@ export default function WithdrawPage() {
       icon: CoinsIcon,
       description: t("withdrawViaCrypto"),
       processingTime: "10 - 60 " + t("minutes"),
-      fee: "Network fee",
+      fee: t("free"),
       limits: "20 - 100,000 USD",
     },
   ];
