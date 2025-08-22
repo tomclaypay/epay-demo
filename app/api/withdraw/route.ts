@@ -75,6 +75,11 @@ export async function POST(request: Request) {
       });
       withdrawData.ref = data.code;
     }
+    accountData.balances[0].available += Number.parseFloat(
+      withdrawData.amount.toFixed(2)
+    );
+
+    await saveTransactions(accountData, "epay", "account.json");
 
     const transactionsData = await loadTransactions(
       "epay",

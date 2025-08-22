@@ -1,4 +1,5 @@
 import { loadTransactions, saveTransactions } from "@/lib/supabase";
+import { calculateOverrideValues } from "next/dist/server/font-utils";
 import { NextRequest, NextResponse } from "next/server";
 
 // POST { text: string, size?: number }
@@ -46,7 +47,6 @@ export async function POST(req: NextRequest) {
       );
     }
     if (isCrypto) {
-      console.log("isCrypto", isCrypto);
       const depositData = {
         transactionId: `DEP_${Date.now()}`,
         method: "crypto",
@@ -80,13 +80,15 @@ export async function POST(req: NextRequest) {
           );
         }
       } else {
-        accountData.balances[0].available -= Number.parseFloat(
-          transaction.amount.toFixed(2)
-        );
         transaction.updatedAt = new Date().toISOString();
         transaction.status = "success";
       }
     } else if (orderStatus === "CANCELED") {
+      if (orderType === "WITHDRAWAL") {
+        accountData.balances[0].available += Number.parseFloat(
+          transaction.amount.toFixed(2)
+        );
+      }
       transaction.status = "cancel";
     }
 
