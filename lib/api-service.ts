@@ -108,7 +108,8 @@ class ApiService {
     status?: string;
   }) {
     const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.append("page", params.page.toString());
+    if (params?.page)
+      searchParams.append("offset", (params.page - 1).toString());
     if (params?.limit) searchParams.append("limit", params.limit.toString());
     if (params?.type) searchParams.append("type", params.type);
     if (params?.status) searchParams.append("status", params.status);

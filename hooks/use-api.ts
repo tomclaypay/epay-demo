@@ -16,6 +16,19 @@ export function useTransactions(params?: {
     currentPage: number;
     limit: number;
   } | null>(null);
+  const [stats, setStats] = useState<{
+    totalDeposits: number;
+    totalWithdrawals: number;
+    netBalance: number;
+    depositCount: number;
+    withdrawalCount: number;
+  } | null>({
+    totalDeposits: 0,
+    totalWithdrawals: 0,
+    netBalance: 0,
+    depositCount: 0,
+    withdrawalCount: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,11 +39,12 @@ export function useTransactions(params?: {
         const data = await apiService.getTransactions(params);
         setTransactions(data.transactions);
         setPagination({
-          total: data.total,
-          totalPages: data.totalPages,
-          currentPage: data.currentPage,
-          limit: data.limit,
+          total: data.pagination.total,
+          totalPages: data.pagination.totalPages,
+          currentPage: data.pagination.offset + 1,
+          limit: data.pagination.limit,
         });
+        setStats(data.stats);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -41,5 +55,5 @@ export function useTransactions(params?: {
     fetchTransactions();
   }, [JSON.stringify(params)]);
 
-  return { transactions, pagination, loading, error };
+  return { transactions, pagination, loading, error, stats };
 }

@@ -41,34 +41,10 @@ export default function TransactionsPage() {
     [currentPage, filter]
   );
 
-  const { transactions, loading, pagination } =
+  const { transactions, loading, pagination, stats } =
     useTransactions(transactionParams);
 
-  const stats = transactions?.reduce(
-    (acc, transaction) => {
-      if (transaction.status === "success") {
-        if (transaction.type === "deposit") {
-          acc.totalDeposits += transaction.amount;
-          acc.depositCount += 1;
-        } else {
-          acc.totalWithdrawals += transaction.amount;
-          acc.withdrawalCount += 1;
-        }
-      }
-      return acc;
-    },
-    {
-      totalDeposits: 0,
-      totalWithdrawals: 0,
-      depositCount: 0,
-      withdrawalCount: 0,
-    }
-  ) || {
-    totalDeposits: 0,
-    totalWithdrawals: 0,
-    depositCount: 0,
-    withdrawalCount: 0,
-  };
+  console.log("transactions", transactions, pagination);
 
   const filterOptions = [
     { value: "all", label: t("allTransactions") },
@@ -112,10 +88,10 @@ export default function TransactionsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    {stats.totalDeposits.toLocaleString()} USD
+                    {stats?.totalDeposits.toLocaleString()} USD
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {stats.depositCount} {t("transactions")}
+                    {stats?.depositCount} {t("transactions")}
                   </p>
                 </CardContent>
               </Card>
@@ -129,10 +105,10 @@ export default function TransactionsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-600">
-                    {stats.totalWithdrawals.toLocaleString()} USD
+                    {stats?.totalWithdrawals.toLocaleString()} USD
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {stats.withdrawalCount} {t("transactions")}
+                    {stats?.withdrawalCount} {t("transactions")}
                   </p>
                 </CardContent>
               </Card>
@@ -147,7 +123,7 @@ export default function TransactionsPage() {
                 <CardContent>
                   <div className="text-2xl font-bold text-blue-600">
                     {(
-                      stats.totalDeposits - stats.totalWithdrawals
+                      stats?.totalDeposits - stats?.totalWithdrawals
                     ).toLocaleString()}{" "}
                     USD
                   </div>
@@ -166,7 +142,7 @@ export default function TransactionsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-purple-600">
-                    {stats.depositCount + stats.withdrawalCount}
+                    {stats?.depositCount + stats?.withdrawalCount}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {t("allTime")}

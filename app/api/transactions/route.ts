@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const type = searchParams.get("type"); // 'deposit' | 'withdraw' | 'all'
     const limit = Number.parseInt(searchParams.get("limit") || "20");
     const offset = Number.parseInt(searchParams.get("offset") || "0");
-
+    console.log({ type, limit, offset });
     const transactionsData = await loadTransactions(
       "epay",
       "transactions.json"
@@ -17,6 +17,22 @@ export async function GET(request: Request) {
 
     // Filter by type if specified
     let filteredTransactions = transactionsData.transactions;
+    const totalPages = Math.ceil(filteredTransactions.length / (limit || 1));
+    // summary statistics
+    const totalDeposits = filteredTransactions
+      .filter((tx) => tx.type === "deposit" && tx.status === "success")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+    const totalWithdrawals = filteredTransactions
+      .filter((tx) => tx.type === "withdraw" && tx.status === "success")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+    const netBalance = totalDeposits - totalWithdrawals;
+    const depositCount = filteredTransactions.filter(
+      (tx) => tx.type === "deposit"
+    ).length;
+    const withdrawalCount = filteredTransactions.filter(
+      (tx) => tx.type === "withdraw"
+    ).length;
+
     if (type && type !== "all") {
       filteredTransactions = transactionsData.transactions.filter(
         (tx) => tx.type === type
@@ -34,8 +50,16 @@ export async function GET(request: Request) {
       pagination: {
         total: filteredTransactions.length,
         limit,
+        totalPages,
         offset,
         hasMore: offset + limit < filteredTransactions.length,
+      },
+      stats: {
+        totalDeposits,
+        totalWithdrawals,
+        netBalance,
+        depositCount,
+        withdrawalCount,
       },
     };
 
