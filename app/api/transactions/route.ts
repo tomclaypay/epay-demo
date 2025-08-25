@@ -39,7 +39,7 @@ export async function GET(request: Request) {
         (tx) => tx.type === type
       );
     }
-
+    console.log("search", search);
     if (search) {
       const lowerSearch = search.toLowerCase();
       filteredTransactions = filteredTransactions.filter(

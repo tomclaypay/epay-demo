@@ -39,7 +39,7 @@ export default function TransactionsPage() {
       type: filter === "all" ? undefined : (filter as "deposit" | "withdraw"),
       search: searchTerm,
     }),
-    [currentPage, filter]
+    [currentPage, filter, searchTerm]
   );
 
   const { transactions, loading, pagination, stats } =
