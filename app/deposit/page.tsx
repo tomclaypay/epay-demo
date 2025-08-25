@@ -26,6 +26,7 @@ import { apiService } from "@/lib/api-service";
 import { epayAPI } from "@/lib/epay-api";
 import { TransactionSuccessModal } from "@/components/transaction-success-modal";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function DepositPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -95,6 +96,12 @@ export default function DepositPage() {
     setIsLoading(true);
     try {
       if (selectedOption === "vietqr") {
+        if (Number(amount) < 230000 || Number(amount) > 253000000) {
+          toast.warning(t("amountMustBeBetween"));
+          setIsLoading(false);
+          setAmount("");
+          return;
+        }
         const response = await apiService.createDeposit({
           method: selectedOption || "vietqr",
           amount: Number(amount),
@@ -187,7 +194,9 @@ export default function DepositPage() {
             )}
             {selectedOption === "vietqr" && (
               <div className="space-y-2">
-                <Label htmlFor="amount">{t("amount")}</Label>
+                <Label htmlFor="amount">
+                  {t("amount")} VND <span className="text-rose-500">(*)</span>
+                </Label>
                 <Input
                   id="amount"
                   type="number"

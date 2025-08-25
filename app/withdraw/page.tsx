@@ -25,6 +25,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { apiService } from "@/lib/api-service";
 import { TransactionSuccessModal } from "@/components/transaction-success-modal";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function WithdrawPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -84,6 +85,18 @@ export default function WithdrawPage() {
     setIsLoading(true);
     try {
       if (selectedOption === "vietqr") {
+        if (!amount || Number(amount) <= 0) {
+          toast.warning(t("enterWithdrawalAmount"));
+          setIsLoading(false);
+          return;
+        }
+
+        if (!bankNameDest || !bankAccountNumberDest || !bankAccountNameDest) {
+          toast.warning(t("enterAllBankDetails"));
+          setIsLoading(false);
+          return;
+        }
+
         // Handle VietQR withdrawal
         await apiService.createWithdraw({
           method: selectedOption || "vietqr",
@@ -94,6 +107,18 @@ export default function WithdrawPage() {
         });
       } else {
         // Handle crypto withdrawal
+        if (!amount || Number(amount) <= 0) {
+          toast.warning(t("enterWithdrawalAmount"));
+          setIsLoading(false);
+          return;
+        }
+
+        if (!address) {
+          toast.warning(t("enterCryptoAddress"));
+          setIsLoading(false);
+          return;
+        }
+
         await apiService.createWithdraw({
           method: selectedOption || "crypto",
           amount: Number(amount),
@@ -156,7 +181,9 @@ export default function WithdrawPage() {
           <CardContent className="space-y-4">
             {selectedOption === "crypto" && (
               <div className="space-y-2">
-                <Label htmlFor="crypto-select">{t("network")}</Label>
+                <Label htmlFor="crypto-select">
+                  {t("network")} <span className="text-rose-500">(*)</span>
+                </Label>
                 <Select
                   value={selectedCrypto}
                   onValueChange={setSelectedCrypto}
@@ -176,7 +203,9 @@ export default function WithdrawPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="amount">{t("withdrawAmount")}</Label>
+              <Label htmlFor="amount">
+                {t("withdrawAmount")} <span className="text-rose-500">(*)</span>
+              </Label>
               <Input
                 id="amount"
                 type="number"
@@ -199,7 +228,10 @@ export default function WithdrawPage() {
 
             {selectedOption === "vietqr" && (
               <div className="space-y-2">
-                <Label htmlFor="amount">{t("withdrawAmount")} VND</Label>
+                <Label htmlFor="amount">
+                  {t("withdrawAmount")} VND{" "}
+                  <span className="text-rose-500">(*)</span>
+                </Label>
                 <Input
                   id="amount"
                   type="number"
@@ -212,7 +244,10 @@ export default function WithdrawPage() {
 
             {selectedOption === "crypto" ? (
               <div className="space-y-2">
-                <Label htmlFor="address">{t("walletAddress")}</Label>
+                <Label htmlFor="address">
+                  {t("walletAddress")}{" "}
+                  <span className="text-rose-500">(*)</span>
+                </Label>
                 <Input
                   id="address"
                   placeholder={t("enterCryptoAddress")}
@@ -223,7 +258,9 @@ export default function WithdrawPage() {
             ) : (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="bank">{t("bank")}</Label>
+                  <Label htmlFor="bank">
+                    {t("bank")} <span className="text-rose-500">(*)</span>
+                  </Label>
                   <Select value={bankNameDest} onValueChange={setBankNameDest}>
                     <SelectTrigger>
                       <SelectValue placeholder={t("selectBank")} />
@@ -237,7 +274,10 @@ export default function WithdrawPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="account-number">{t("bankAccount")}</Label>
+                  <Label htmlFor="account-number">
+                    {t("bankAccount")}{" "}
+                    <span className="text-rose-500">(*)</span>
+                  </Label>
                   <Input
                     id="account-number"
                     placeholder={t("enterBankAccount")}
@@ -246,7 +286,10 @@ export default function WithdrawPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="account-name">{t("accountHolder")}</Label>
+                  <Label htmlFor="account-name">
+                    {t("accountHolder")}{" "}
+                    <span className="text-rose-500">(*)</span>
+                  </Label>
                   <Input
                     id="account-name"
                     placeholder={t("enterAccountHolder")}

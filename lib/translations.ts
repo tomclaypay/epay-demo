@@ -45,6 +45,10 @@ export const translations = {
     depositWalletAddress: "Địa chỉ ví nạp tiền",
     depositWalletAddressDescription:
       "Vui lòng nạp đúng mạng lưới đã chọn, nếu nạp sai mạng lưới sẽ bị mất",
+    amountMustBeBetween:
+      "Số tiền phải nằm trong khoảng từ 230,000 VND đến 253,000,000 VND",
+    enterWithdrawalAmount: "Vui lòng nhập số tiền rút",
+    enterAllBankDetails: "Vui lòng nhập đầy đủ thông tin ngân hàng",
     // Forms
     selectNetwork: "Chọn mạng lưới",
     amount: "Số tiền",
@@ -167,7 +171,8 @@ export const translations = {
     depositWalletAddress: "Deposit wallet address",
     depositWalletAddressDescription:
       "Please load the correct network selected, if you load the wrong network it will be lost.",
-
+    amountMustBeBetween:
+      "Amount must be between 230,000 VND and 253,000,000 VND",
     // Forms
     selectNetwork: "Select network",
     amount: "Amount",
