@@ -18,7 +18,6 @@ export async function GET(request: Request) {
 
     // Filter by type if specified
     let filteredTransactions = transactionsData.transactions;
-    const totalPages = Math.ceil(filteredTransactions.length / (limit || 1));
     // summary statistics
     const totalDeposits = filteredTransactions
       .filter((tx) => tx.type === "deposit" && tx.status === "success")
@@ -39,7 +38,6 @@ export async function GET(request: Request) {
         (tx) => tx.type === type
       );
     }
-    console.log("search", search);
     if (search) {
       const lowerSearch = search.toLowerCase();
       filteredTransactions = filteredTransactions.filter(
@@ -55,6 +53,9 @@ export async function GET(request: Request) {
             tx.bankNameDest.toLowerCase().includes(lowerSearch))
       );
     }
+
+    // Calculate total pages
+    const totalPages = Math.ceil(filteredTransactions.length / limit);
 
     // Apply pagination
     const paginatedTransactions = filteredTransactions.slice(
