@@ -51,16 +51,6 @@ export default function TransactionsPage() {
     { value: "withdraw", label: t("withdrawals") },
   ];
 
-  const filteredTransactions =
-    transactions?.filter(
-      (transaction) =>
-        transaction.method.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.description
-          ?.toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        transaction.id.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
-
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -193,14 +183,14 @@ export default function TransactionsPage() {
             ) : (
               <>
                 <div className="space-y-3">
-                  {filteredTransactions.map((transaction) => (
+                  {transactions.map((transaction) => (
                     <TransactionCard
                       key={transaction.id}
                       transaction={transaction}
                     />
                   ))}
 
-                  {filteredTransactions.length === 0 && (
+                  {transactions.length === 0 && (
                     <Card>
                       <CardContent className="py-12 text-center">
                         <ActivityIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
