@@ -135,7 +135,7 @@ export default function WithdrawPage() {
       });
       setShowSuccessModal(true);
       setAmount("");
-      setSelectedCrypto("");
+      setSelectedCrypto("TRON");
       setAddress("");
       setSelectedOption(null);
       setIsLoading(false);
