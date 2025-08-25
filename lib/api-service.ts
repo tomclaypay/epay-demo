@@ -105,6 +105,7 @@ class ApiService {
     page?: number;
     limit?: number;
     type?: "deposit" | "withdraw";
+    search?: string;
     status?: string;
   }) {
     const searchParams = new URLSearchParams();
@@ -113,6 +114,7 @@ class ApiService {
     if (params?.limit) searchParams.append("limit", params.limit.toString());
     if (params?.type) searchParams.append("type", params.type);
     if (params?.status) searchParams.append("status", params.status);
+    if (params?.search) searchParams.append("search", params.search);
 
     const response = await fetch(
       `${this.baseUrl}/transactions?${searchParams}`

@@ -20,7 +20,6 @@ export function Header() {
   useEffect(() => {
     const getBalance = async () => {
       const response = await apiService.getAccount();
-      console.log("response", response);
       setBalance(
         Number(
           typeof response.balances[0] === "object"

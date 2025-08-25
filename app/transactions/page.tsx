@@ -37,14 +37,13 @@ export default function TransactionsPage() {
       page: currentPage,
       limit: 10,
       type: filter === "all" ? undefined : (filter as "deposit" | "withdraw"),
+      search: searchTerm,
     }),
     [currentPage, filter]
   );
 
   const { transactions, loading, pagination, stats } =
     useTransactions(transactionParams);
-
-  console.log("transactions", transactions, pagination);
 
   const filterOptions = [
     { value: "all", label: t("allTransactions") },

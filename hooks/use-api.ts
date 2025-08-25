@@ -7,6 +7,7 @@ export function useTransactions(params?: {
   page?: number;
   limit?: number;
   type?: "deposit" | "withdraw";
+  search?: string;
   status?: string;
 }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);

@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const type = searchParams.get("type"); // 'deposit' | 'withdraw' | 'all'
     const limit = Number.parseInt(searchParams.get("limit") || "20");
     const offset = Number.parseInt(searchParams.get("offset") || "0");
+    const search = searchParams.get("search") || "";
     console.log({ type, limit, offset });
     const transactionsData = await loadTransactions(
       "epay",
@@ -36,6 +37,23 @@ export async function GET(request: Request) {
     if (type && type !== "all") {
       filteredTransactions = transactionsData.transactions.filter(
         (tx) => tx.type === type
+      );
+    }
+
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      filteredTransactions = filteredTransactions.filter(
+        (tx) =>
+          tx.id.toLowerCase().includes(lowerSearch) ||
+          (tx.method && tx.method.toLowerCase().includes(lowerSearch)) ||
+          (tx.walletAddress &&
+            tx.walletAddress.toLowerCase().includes(lowerSearch)) ||
+          (tx.bankAccountNumberDest &&
+            tx.bankAccountNumberDest.toLowerCase().includes(lowerSearch)) ||
+          (tx.bankAccountNameDest &&
+            tx.bankAccountNameDest.toLowerCase().includes(lowerSearch)) ||
+          (tx.bankNameDest &&
+            tx.bankNameDest.toLowerCase().includes(lowerSearch))
       );
     }
 
