@@ -173,6 +173,8 @@ export const translations = {
       "Please load the correct network selected, if you load the wrong network it will be lost.",
     amountMustBeBetween:
       "Amount must be between 230,000 VND and 253,000,000 VND",
+    enterWithdrawalAmount: "Please enter withdrawal amount",
+    enterAllBankDetails: "Please enter all bank details",
     // Forms
     selectNetwork: "Select network",
     amount: "Amount",
