@@ -44,10 +44,10 @@ export async function GET(request: Request) {
       const lowerSearch = search.toLowerCase();
       filteredTransactions = filteredTransactions.filter(
         (tx) =>
-          tx.id.toLowerCase().includes(lowerSearch) ||
-          (tx.method && tx.method.toLowerCase().includes(lowerSearch)) ||
-          (tx.walletAddress &&
-            tx.walletAddress.toLowerCase().includes(lowerSearch)) ||
+          tx.transactionId.toLowerCase().includes(lowerSearch)(
+            tx.walletAddress &&
+              tx.walletAddress.toLowerCase().includes(lowerSearch)
+          ) ||
           (tx.bankAccountNumberDest &&
             tx.bankAccountNumberDest.toLowerCase().includes(lowerSearch)) ||
           (tx.bankAccountNameDest &&
